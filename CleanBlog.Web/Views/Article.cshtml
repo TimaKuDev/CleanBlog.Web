@@ -1,0 +1,15 @@
+﻿@inherits UmbracoViewPage<Umbraco.Web.PublishedModels.Article>
+
+@using CleanBlog.Core.Extensions
+
+@{
+    Layout = "master.cshtml";
+}
+
+<!-- Page Header-->
+@Html.Partial("~/Views/Partials/pageHeader.cshtml")
+
+<!-- Post Content-->
+<article class="mb-4">
+    @Html.GetGridHtml(Model, "mainContent", "Clean", fluidImages: true)
+</article>

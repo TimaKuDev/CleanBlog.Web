@@ -1,0 +1,89 @@
+﻿@inherits CleanBlogViewPage
+
+@using CleanBlog.Core.ViewPages
+@using CleanBlog.Core.Helpers
+
+@{
+    //var articles = Model.Root().Descendants().Where(x => x.ContentType.Alias == "article" && x.IsVisible()).OrderByDescending(y => y.Value());
+    //var articleList = Model.Root().Descendants<ArticleList>().FirstOrDefault();
+
+    var resultSet = ArticleService.GetLatestArticles(Model, Request);
+
+}
+
+@if (resultSet != null && resultSet.Results != null && resultSet.Results.Any())
+{
+    var articles = resultSet.Results.Cast<Article>();
+    <!-- Main Content-->
+    <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                @foreach (var article in articles)
+                {
+                    <!-- Post preview-->
+                    <div class="post-preview">
+                        <a href="@article.Url()">
+                            <h2 class="post-title">
+                                @(!string.IsNullOrWhiteSpace(article.Title) ? article.Title : article.Name)
+                            </h2>
+                            @if (!string.IsNullOrWhiteSpace(article.Subtitle))
+                            {
+                                <h3 class="post-subtitle">
+                                    @article.Subtitle
+                                </h3>
+                            }
+                        </a>
+                        <p class="post-meta">
+                            Posted
+                            @if (!string.IsNullOrWhiteSpace(article.AuthorName))
+                            {
+                                @Html.Raw("by ") @article.AuthorName
+                            }
+                            on @article.ArticleDate.ToString("MMMM dd, yyyy")
+                        </p>
+                    </div>
+                    <!-- Divider-->
+                    <hr class="my-4" />
+                }
+
+
+                <!-- Pager-->
+                <div id="paging" class="d-flex justify-content-end mb-4">
+                    @if (resultSet.IsArticleListPage)
+                    {
+                        if (resultSet.PageCount> 1)
+                        {
+                            <div class="paging-block">
+                                @if (resultSet.PageNumber > 1)
+                                {
+                                <a class="btn btn-primary float-left" href="@($"{resultSet.Url}?page={resultSet.PageNumber - 1}&size={resultSet.PageSize}")">@Umbraco.GetDictionaryValue("Blog.Prev.Button.Text")</a>
+                                }
+                                else
+                                {
+                                    @Html.Raw("&nbsp;")
+                                }
+                            </div>
+                            <div class="paging-block text-center">
+                                <span>Page @resultSet.PageNumber of @resultSet.PageCount</span>
+                            </div>
+                            <div class="paging-block">
+                                @if (resultSet.PageNumber < resultSet.PageCount)
+                                {
+                                <a class="btn btn-primary float-right" href="@($"{resultSet.Url}?page={resultSet.PageNumber + 1}&size={resultSet.PageSize}")">@Umbraco.GetDictionaryValue("Blog.Next.Button.Text")</a>
+                                }
+                                else
+                                {
+                                    @Html.Raw("&nbsp;")
+                                }
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <a class="btn btn-primary float-right" href="@(resultSet.Url)">@Umbraco.GetDictionaryValue("Blog.ViewAll.Button.Text")</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
